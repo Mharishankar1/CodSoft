@@ -1,0 +1,115 @@
+import javax.swing.*;
+import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.util.Random;
+
+public class NumberGuessingGame {
+    private JFrame mainFrame;
+    private JLabel promptLabel;
+    private JTextField inputField;
+    private JButton guessButton;
+    private int targetNumber;
+    private int maxAttempts;
+    private int attempts;
+    private int score;
+
+    public NumberGuessingGame() {
+        mainFrame = new JFrame("Number Guessing Game");
+        promptLabel = new JLabel("Guess here:");
+        inputField = new JTextField(10);
+        guessButton = new JButton("Guess!!");
+
+        targetNumber = generateRandomNumber();
+        maxAttempts = 10;
+        attempts = 0;
+        score = 0;
+
+        guessButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                processGuess();
+            }
+        });
+
+        mainFrame.setLayout(new GridBagLayout());
+        GridBagConstraints gbc = new GridBagConstraints();
+        mainFrame.getContentPane().setBackground(new Color(240, 200, 250));
+
+        promptLabel.setFont(new Font("Arial", Font.BOLD, 30));
+        promptLabel.setForeground(Color.black);
+
+        inputField.setFont(new Font("Arial", Font.PLAIN, 20));
+        inputField.setForeground(Color.gray);
+
+        guessButton.setFont(new Font("Arial", Font.PLAIN, 20));
+        guessButton.setForeground(Color.yellow);
+        guessButton.setBackground(new Color(80, 150, 220));
+
+        gbc.gridx = 0;
+        gbc.gridy = 0;
+        gbc.insets = new Insets(10, 10, 10, 10);
+        mainFrame.add(promptLabel, gbc);
+
+        gbc.gridy = 1;
+        mainFrame.add(inputField, gbc);
+
+        gbc.gridy = 2;
+        mainFrame.add(guessButton, gbc);
+
+        mainFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        mainFrame.setSize(300, 200);
+        mainFrame.setLocationRelativeTo(null);
+        mainFrame.setVisible(true);
+    }
+
+    private int generateRandomNumber() {
+        Random random = new Random();
+        return random.nextInt(100) + 1;
+    }
+
+    private void processGuess() {
+        int userGuess;
+        try {
+            userGuess = Integer.parseInt(inputField.getText());
+        } catch (NumberFormatException ex) {
+            JOptionPane.showMessageDialog(mainFrame, "Please enter a valid number.");
+            return;
+        }
+
+        attempts++;
+
+        if (userGuess == targetNumber) {
+            JOptionPane.showMessageDialog(mainFrame,
+                    "Congratulations! You guessed the correct number in " + attempts + " attempts.");
+            score++;
+            resetGame();
+        } else {
+            String message = (userGuess < targetNumber) ? "Low. Try again." : "High. Try again.";
+            JOptionPane.showMessageDialog(mainFrame, message);
+
+            if (attempts == maxAttempts) {
+                JOptionPane.showMessageDialog(mainFrame,
+                        "Sorry! Maximum number of attempts reached. The correct number is: "
+                                + targetNumber);
+                showScore();
+            }
+        }
+    }
+
+    private void showScore() {
+        JOptionPane.showMessageDialog(mainFrame, "Final Score" + score);
+        mainFrame.dispose();
+        System.exit(0);
+    }
+
+    private void resetGame() {
+        targetNumber = generateRandomNumber();
+        attempts = 0;
+    }
+
+    public static void main(String[] args) {
+        SwingUtilities.invokeLater(() -> new NumberGuessingGame());
+    }
+}
+
